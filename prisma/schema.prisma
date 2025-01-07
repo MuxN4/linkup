@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  username String @unique
+  clerkId String @unique
+  name String?
+  bio String?
+  image String?
+  location String?
+  website String?
+  createdAt DateTime @default(now()) // member since 2024
+  updatedAt DateTime @updatedAt
+
+  // Relations: 
+  posts Post[] // User's posts
+  comments Comment[] // User's comments
+  likes Like[] // Posts the user liked
+
+  followers Follows[] @relation("following") // Users following this user
+  following Follows[] @relation("follower") // Users this user is following
+
+  notifications Notification[] @relation("userNotifications") // notifications received by a user
+  notificationsCreated Notification[] @relation("notificationCreator") // notifications triggered by a user
+}
+
+model Post {
+  id String @id @default(cuid())
+  authorId String
+  content String?
+  image String?
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @updatedAt // Automatically updates when modified
+
+  // Post relationships
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // Delete posts if the user is deleted
+  comments Comment[] // Comments on the post
+  likes Like[] // Users who liked the post
+  notifications Notification[] // Notifications related to the post
+}
+
+model Comment {
+  id String @id @default(cuid())
+  content String
+  authorId String
+  postId String
+  createdAt DateTime @default(now()) // Comment creation date
+
+  // Comment relationships
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // Delete comment if author is deleted
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // Delete comment if post is deleted
+  notifications Notification[] // Notifications related to the comment
+
+  @@index([authorId, postId]) // Improves query speed for author-post combinations
+}
+
+model Like {
+  id String @id @default(cuid())
+  postId String
+  userId String
+  createdAt DateTime @default(now()) // Like creation date
+
+  // Like relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Delete like if user is deleted
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // Delete like if post is deleted
+
+  @@index([userId, postId]) // Improves query speed for user-post combinations
+  @@unique([userId, postId]) // Prevents the same user from liking the post multiple times
+}
+
+model Follows {
+  followerId String
+  followingId String
+  createdAt DateTime @default(now()) // Follow date
+
+  // Follow relationships
+  follower User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade) // Delete follow if follower is deleted
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade) // Delete follow if followed user is deleted
+
+  @@index([followerId, followingId]) // Improves query speed for follower-following combinations
+  @@id([followerId, followingId]) // Prevents duplicate follows
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  creatorId String
+  type NotificationType
+  read Boolean @default(false) // Marks if the notification has been read
+  postId String?
+  commentId String?
+  createdAt DateTime @default(now()) 
+  
+  // Notification relationships
+  user User @relation("userNotifications", fields: [userId], references: [id], onDelete: Cascade) // Delete notification if user is deleted
+  creator User @relation("notificationCreator", fields: [creatorId], references: [id], onDelete: Cascade) // Delete notification if creator is deleted
+  post Post? @relation(fields: [postId], references: [id], onDelete: Cascade) // Related post (optional)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade) // Related comment (optional)
+
+  @@index([userId, createdAt]) // Improves query speed for user and date combinations
+}
+
+enum NotificationType {
+  LIKE // Notification for a like
+  COMMENT // Notification for a comment
+  FOLLOW // Notification for a follow
+}
