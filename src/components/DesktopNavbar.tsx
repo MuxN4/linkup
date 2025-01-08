@@ -14,7 +14,7 @@ async function DesktopNavbar() {
 
       <Button 
         variant="ghost" 
-        className="flex items-center gap-2" 
+        className="flex items-center gap-2 hover:text-green-500 transition-colors duration-200" 
         asChild
       >
         <Link href="/">
@@ -27,7 +27,7 @@ async function DesktopNavbar() {
         <>
           <Button 
             variant="ghost" 
-            className="flex items-center gap-2" 
+            className="flex items-center gap-2 hover:text-green-500 transition-colors duration-200" 
             asChild
           >
             <Link href="/notifications">
@@ -45,7 +45,7 @@ async function DesktopNavbar() {
               }`}
             >
               <UserIcon className="w-4 h-4" />
-              <span className="hidden lg:inline">
+              <span className="hidden lg:inline hover:text-green-500 transition-colors duration-200">
                 Profile
               </span>
             </Link>

@@ -19,7 +19,7 @@ function MobileNavbar() {
         variant="ghost"
         size="icon"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="mr-2"
+        className="mr-2 hover:text-green-500 transition-colors duration-200"
       >
         <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -31,8 +31,9 @@ function MobileNavbar() {
           <Button 
             variant="ghost" 
             size="icon"
+            className="hover:text-green-500 transition-colors duration-200"
           >
-            <MenuIcon className="h-5 w-5" />
+            <MenuIcon className="h-5 w-5 " />
           </Button>
         </SheetTrigger>
 
@@ -46,7 +47,7 @@ function MobileNavbar() {
           <nav className="flex flex-col space-y-4 mt-6">
             <Button 
               variant="ghost" 
-              className="flex items-center gap-3 justify-start" 
+              className="flex items-center gap-3 justify-start hover:text-green-500 transition-colors duration-200" 
               asChild
             >
               <Link href="/">
@@ -59,7 +60,7 @@ function MobileNavbar() {
               <>
                 <Button 
                   variant="ghost" 
-                  className="flex items-center gap-3 justify-start" 
+                  className="flex items-center gap-3 justify-start hover:text-green-500 transition-colors duration-200" 
                   asChild
                 >
                   <Link href="/notifications">
@@ -70,7 +71,7 @@ function MobileNavbar() {
 
                 <Button  
                   variant="ghost" 
-                  className="flex items-center gap-3 justify-start" 
+                  className="flex items-center gap-3 justify-start hover:text-green-500 transition-colors duration-200" 
                   asChild
                 >
                   <Link href="/profile">
@@ -82,7 +83,7 @@ function MobileNavbar() {
                 <SignOutButton>
                   <Button 
                     variant="ghost" 
-                    className="flex items-center gap-3 justify-start w-full"
+                    className="flex items-center gap-3 justify-start w-full hover:text-green-500 transition-colors duration-200"
                   >
                     <LogOutIcon className="w-4 h-4" />
                     Logout
