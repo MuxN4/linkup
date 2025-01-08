@@ -5,9 +5,11 @@ import ProfilePageClient from "./ProfilePageClient";
 export async function generateMetadata({ 
   params 
 }: {
-  params: Promise<{ username: string }> | { username: string }
+  params: Promise<{ username: string }>
 }) {
-    const resolvedParams = await params;
+    const resolvedParams = await params; // Await the Promise to get the params
+    if (!resolvedParams.username) return; // Handle the case where username is undefined
+
     const user = await getProfileByUsername(resolvedParams.username);
     if (!user) return;
 
@@ -20,12 +22,13 @@ export async function generateMetadata({
 async function ProfilePageServer({ 
   params 
 }: {
-  params: Promise<{ username: string }> | { username: string }
+  params: Promise<{ username: string }>
 }) {
-    const resolvedParams = await params;
-    const user = await getProfileByUsername(resolvedParams.username);
+    const resolvedParams = await params; // Await the Promise to get the params
+    if (!resolvedParams.username) notFound(); // Handle the case where username is undefined
 
-    if (!user) notFound();
+    const user = await getProfileByUsername(resolvedParams.username);
+    if (!user) notFound(); // Handle the null case
 
     const [posts, likedPosts, isCurrentUserFollowing] = await Promise.all([
         getUserPosts(user.id),
