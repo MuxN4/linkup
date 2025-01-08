@@ -38,7 +38,7 @@ export async function syncUser() {
 
         return dbUser;
     } catch (error) {
-        console.log("Error synchronizing user data", error);
+      console.log("Error synchronizing user data", error);
     }
 }
 
@@ -62,7 +62,7 @@ export async function getUserByClerkId(clerkId: string) {
 
 export async function getDbUserId() {
   const { userId: clerkId } = await auth();
-  if (!clerkId) throw new Error("Authentication failed: User not logged in.");
+  if (!clerkId) return null
 
   const user = await getUserByClerkId(clerkId);
 
@@ -73,20 +73,27 @@ export async function getDbUserId() {
 
 export async function getRandomUsers() {
   try {
+    // Retrieve the ID of the currently authenticated user
     const userId = await getDbUserId();
 
-    if (!userId) return [];
+    // If the user is not authenticated, return an empty array
+    if (!userId) {
+      console.warn("User is not authenticated. Unable to fetch random users.");
+      return [];
+    }
 
-    // Fetch 3 random users, excluding the current user and those already followed
+    // Fetch 3 random users from the database who:
+    // 1. Are not the current user.
+    // 2. Are not already followed by the current user.
     const randomUsers = await prisma.user.findMany({
       where: {
         AND: [
-          { NOT: { id: userId } },
+          { NOT: { id: userId } }, // Exclude the current user
           {
             NOT: {
               followers: {
                 some: {
-                  followerId: userId,
+                  followerId: userId, // Exclude users already followed by the current user
                 },
               },
             },
@@ -100,16 +107,16 @@ export async function getRandomUsers() {
         image: true,
         _count: {
           select: {
-            followers: true,
+            followers: true, // Include follower count for each user
           },
         },
       },
-      take: 3,
+      take: 3,  // Limit to 3 random users
     });
 
     return randomUsers;
   } catch (error) {
-    console.log("Failed to fetch random users:", error);
+    console.log("An error occurred while fetching random users:", error);
     return [];
   }
 }
